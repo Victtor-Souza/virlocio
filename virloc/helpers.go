@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func CalculateChecksum(data string) string {
+func calculateChecksum(data string) string {
 	msg := data[:len(data)-4]
 
 	var calc byte
@@ -21,7 +21,7 @@ func CalculateChecksum(data string) string {
 	return calculatedChecksum
 }
 
-func RemoveSpecialCharsAndSpaces(message string) string {
+func removeSpecialCharsAndSpaces(message string) string {
 	rmvSp := strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(message, " ", ""), ">", " "), "<", "")
 	return rmvSp
 }

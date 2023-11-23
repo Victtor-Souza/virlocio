@@ -30,10 +30,10 @@ type QTT struct {
 	AnalogInput2Voltage                string
 	InternalBatteryVoltage             string
 	MainSupplyVoltage                  string
-	Header                             Header
+	Header                             header
 }
 
-func NewQTT(ms Message) VirlocReport {
+func newQTT(ms message) VirlocReport {
 	qtt := QTT{
 		RawData: ms.Message,
 		Header:  ms.Header,
@@ -47,12 +47,12 @@ func (qtt *QTT) ToRawMessage() string {
 
 func (qtt *QTT) AcceptMessage() string {
 	ackmsg := fmt.Sprintf(">ACK;%s;%s", qtt.Header.DeviceId, qtt.Header.MessageNumber)
-	chksum := CalculateChecksum(qtt.RawData)
+	chksum := calculateChecksum(qtt.RawData)
 	return fmt.Sprintf("%s;*%s<", ackmsg, chksum)
 }
 
 func (qtt *QTT) serialize(msg string) VirlocReport {
-	messagewspace := RemoveSpecialCharsAndSpaces(msg)
+	messagewspace := removeSpecialCharsAndSpaces(msg)
 	if _, err := fmt.Sscanf(messagewspace, "%3s%6s%6s%8s%9s%3s%3s%1s%2s%2s%2s%2s%1s%1s%2s%2s%2s%1s%1s%1s%4s%4s%4s%4s%4s",
 		&qtt.PackageType,
 		&qtt.Date,

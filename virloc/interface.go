@@ -1,11 +1,11 @@
 package virloc
 
-type Message struct {
+type message struct {
 	Message string
-	Header  Header
+	Header  header
 }
 
-type Header struct {
+type header struct {
 	DeviceId      string
 	MessageNumber string
 	CheckSum      string

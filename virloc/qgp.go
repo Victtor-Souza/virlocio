@@ -7,7 +7,7 @@ import (
 type QGP struct {
 	RawData                     string
 	PackageType                 string
-	Header                      Header
+	Header                      header
 	DateTimeEvent               string
 	Latitude                    string
 	Longitude                   string
@@ -22,7 +22,7 @@ type QGP struct {
 
 func (qgp *QGP) AcceptMessage() string {
 	ackmsg := fmt.Sprintf(">ACK;%s;%s", qgp.Header.DeviceId, qgp.Header.MessageNumber)
-	chksum := CalculateChecksum(qgp.RawData)
+	chksum := calculateChecksum(qgp.RawData)
 	return fmt.Sprintf("%s;*%s<", ackmsg, chksum)
 }
 
@@ -31,7 +31,7 @@ func (qgp *QGP) ToRawMessage() string {
 }
 
 func (qgp *QGP) serialize(msg string) VirlocReport {
-	messagewspace := RemoveSpecialCharsAndSpaces(msg)
+	messagewspace := removeSpecialCharsAndSpaces(msg)
 	_, err := fmt.Sscanf(messagewspace, "%3s%12s%8s%9s%3s%3s%1s%2s%2s%2s%2s",
 		&qgp.PackageType,
 		&qgp.DateTimeEvent,
@@ -51,7 +51,7 @@ func (qgp *QGP) serialize(msg string) VirlocReport {
 	return qgp
 }
 
-func NewQGP(ms Message) VirlocReport {
+func newQGP(ms message) VirlocReport {
 	qgp := &QGP{
 		RawData: ms.Message,
 		Header:  ms.Header,
