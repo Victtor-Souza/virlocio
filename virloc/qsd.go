@@ -3,37 +3,29 @@ package virloc
 import "fmt"
 
 type QSD struct {
-	RawData     string
-	Header      header
+	message
 	PackageType string
 	Speed       string
-}
-
-func (qsd *QSD) AcceptMessage() string {
-	ackmsg := fmt.Sprintf(">ACK;%s;%s", qsd.Header.DeviceId, qsd.Header.MessageNumber)
-	chksum := calculateChecksum(qsd.RawData)
-	return fmt.Sprintf("%s;*%s<", ackmsg, chksum)
 }
 
 func (qsd *QSD) ToRawMessage() string {
 	return qsd.RawData
 }
 
-func (qsd *QSD) serialize(msg string) VirlocReport {
+func (qsd *QSD) serialize(msg string) (VirlocReport, error) {
 	msgw := removeSpecialCharsAndSpaces(msg)
 
 	_, err := fmt.Sscanf(msgw, "%3s%4s", &qsd.PackageType, &qsd.Speed)
 	if err != nil {
-		return &QSD{}
+		return nil, ErrReadingMessage(err)
 	}
 
-	return qsd
+	return qsd, nil
 }
 
 func newQSD(ms message) VirlocReport {
 	qsd := &QSD{
-		RawData: ms.Message,
-		Header:  ms.Header,
+		message: ms,
 	}
 
 	return qsd

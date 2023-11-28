@@ -5,7 +5,7 @@ import (
 )
 
 type QTT struct {
-	RawData                            string
+	message
 	PackageType                        string
 	Date                               string
 	Time                               string
@@ -30,13 +30,11 @@ type QTT struct {
 	AnalogInput2Voltage                string
 	InternalBatteryVoltage             string
 	MainSupplyVoltage                  string
-	Header                             header
 }
 
 func newQTT(ms message) VirlocReport {
 	qtt := QTT{
-		RawData: ms.Message,
-		Header:  ms.Header,
+		message: ms,
 	}
 	return &qtt
 }
@@ -45,13 +43,7 @@ func (qtt *QTT) ToRawMessage() string {
 	return qtt.RawData
 }
 
-func (qtt *QTT) AcceptMessage() string {
-	ackmsg := fmt.Sprintf(">ACK;%s;%s", qtt.Header.DeviceId, qtt.Header.MessageNumber)
-	chksum := calculateChecksum(qtt.RawData)
-	return fmt.Sprintf("%s;*%s<", ackmsg, chksum)
-}
-
-func (qtt *QTT) serialize(msg string) VirlocReport {
+func (qtt *QTT) serialize(msg string) (VirlocReport, error) {
 	messagewspace := removeSpecialCharsAndSpaces(msg)
 	if _, err := fmt.Sscanf(messagewspace, "%3s%6s%6s%8s%9s%3s%3s%1s%2s%2s%2s%2s%1s%1s%2s%2s%2s%1s%1s%1s%4s%4s%4s%4s%4s",
 		&qtt.PackageType,
@@ -80,8 +72,8 @@ func (qtt *QTT) serialize(msg string) VirlocReport {
 		&qtt.InternalBatteryVoltage,
 		&qtt.MainSupplyVoltage,
 	); err != nil {
-		return &QTT{}
+		return nil, ErrReadingMessage(err)
 	}
 
-	return qtt
+	return qtt, nil
 }

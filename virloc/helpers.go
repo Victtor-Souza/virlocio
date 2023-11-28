@@ -22,6 +22,11 @@ func calculateChecksum(data string) string {
 }
 
 func removeSpecialCharsAndSpaces(message string) string {
-	rmvSp := strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(message, " ", ""), ">", " "), "<", "")
+	rmvSp := strings.TrimSpace(strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(message, " ", ""), ">", " "), "<", ""))
 	return rmvSp
+}
+
+func removeDeviceData(message string) string {
+	arr := strings.Split(message, ";")
+	return arr[0]
 }

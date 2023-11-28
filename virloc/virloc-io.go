@@ -6,14 +6,20 @@ import (
 )
 
 func Serialize(message string, v VirlocReport) error {
-	v = v.serialize(message)
+	v, err := v.serialize(message)
+
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
 	return nil
 }
 
 func NewVirlocReport(ms string) VirlocReport {
 	hd := extractHeader(ms)
 	message := message{
-		Message: ms,
+		RawData: ms,
 		Header:  hd,
 	}
 	switch getReportType(ms) {
@@ -23,6 +29,12 @@ func NewVirlocReport(ms string) VirlocReport {
 		return newQTT(message)
 	case REPORT_RSD:
 		return newQSD(message)
+	case REPORT_RUV00:
+		return newRUV00(message)
+	case REPORT_RUV01:
+		return newRUV01(message)
+	case REPORT_RUV03:
+		return newRUV03(message)
 	default:
 		return nil
 	}
@@ -43,6 +55,15 @@ func getReportType(ms string) ReportType {
 	_, err := fmt.Sscanf(removeSpecialCharsAndSpaces(ms), "%3s", &reportType)
 	if err != nil {
 		return ""
+	}
+
+	if reportType == "RUV" {
+		_, err := fmt.Sscanf(removeSpecialCharsAndSpaces(ms), "%5s", &reportType)
+		if err != nil {
+			return ""
+		}
+
+		return ReportType(reportType)
 	}
 
 	return ReportType(reportType)
