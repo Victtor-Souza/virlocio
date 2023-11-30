@@ -1,8 +1,12 @@
 package virloc
 
 import (
+	"errors"
 	"fmt"
-	"strings"
+)
+
+var (
+	ErrReportNotConfigured = func(s string) error { return errors.New(fmt.Sprintf("REPORT NOT CONFIGURED: %s", s)) }
 )
 
 func Serialize(message string, v VirlocReport) error {
@@ -16,36 +20,26 @@ func Serialize(message string, v VirlocReport) error {
 	return nil
 }
 
-func NewVirlocReport(ms string) VirlocReport {
-	hd := extractHeader(ms)
-	message := message{
-		RawData: ms,
-		Header:  hd,
-	}
-	switch getReportType(ms) {
+func NewVirlocReport(ms string) (VirlocReport, error) {
+	message := newMessage(ms)
+	rp := getReportType(ms)
+	switch rp {
 	case REPORT_RGP:
-		return newQGP(message)
+		return newQGP(message), nil
 	case REPORT_RTT:
-		return newQTT(message)
+		return newQTT(message), nil
 	case REPORT_RSD:
-		return newQSD(message)
+		return newQSD(message), nil
 	case REPORT_RUV00:
-		return newRUV00(message)
+		return newRUV00(message), nil
 	case REPORT_RUV01:
-		return newRUV01(message)
+		return newRUV01(message), nil
+	case REPORT_RUV02:
+		return newRUV02(message), nil
 	case REPORT_RUV03:
-		return newRUV03(message)
+		return newRUV03(message), nil
 	default:
-		return nil
-	}
-}
-
-func extractHeader(message string) header {
-	messageArr := strings.Split(message, ";")
-	return header{
-		DeviceId:      messageArr[1],
-		MessageNumber: messageArr[2],
-		CheckSum:      messageArr[3],
+		return nil, ErrReportNotConfigured(string(rp))
 	}
 }
 

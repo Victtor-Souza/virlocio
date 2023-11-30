@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func calculateChecksum(data string) string {
+func CalculateChecksum(data string) string {
 	msg := data[:len(data)-4]
 
 	var calc byte
