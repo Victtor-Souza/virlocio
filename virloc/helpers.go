@@ -6,15 +6,14 @@ import (
 )
 
 func CalculateChecksum(data string) string {
-	msg := data[:len(data)-4]
 
 	var calc byte
 	var calculatedChecksum string
-	for r := 0; r < len(msg); r++ {
-		if r > 0 && msg[r] == '*' && msg[r-1] == ';' {
+	for r := 0; r < len(data); r++ {
+		if r > 0 && data[r] == '*' && data[r-1] == ';' {
 			break
 		}
-		caracter := byte(msg[r])
+		caracter := byte(data[r])
 		calc = calc ^ caracter
 	}
 	calculatedChecksum = fmt.Sprintf("%X", calc)

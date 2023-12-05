@@ -47,6 +47,11 @@ func TestSerialize(t *testing.T) {
 			message:  ">RUV02108,NT003,240622184842,11111,22302,33333,44444,55555,66666,77777,88888,00361,600000,300000;ID=0081;#8020;*43<",
 			expected: nil,
 		},
+		{
+			test:     "DEFAULT MESSAGE",
+			message:  ">RSXP01;ID=0081;#8020;*43<",
+			expected: nil,
+		},
 	}
 
 	for _, tC := range testCases {
@@ -81,6 +86,32 @@ func Test_GetSerialNumberId(t *testing.T) {
 			if rp.GetSerialNumber() != tc.expected {
 				t.Fatalf("%s FAILED | expected %v, got %v", tc.test, tc.expected, rp.GetSerialNumber())
 				return
+			}
+		})
+	}
+}
+
+func Test_CalculateCheckSum(t *testing.T) {
+	type TestCase struct {
+		test             string
+		message          string
+		expectedCheckSum string
+	}
+
+	testCases := []TestCase{
+		{
+			test:             "Test checksum",
+			message:          ">SSXP10;ID=0675;#FFFF;",
+			expectedCheckSum: "1B",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.test, func(t *testing.T) {
+			ck := virloc.CalculateChecksum(tc.message)
+
+			if ck != tc.expectedCheckSum {
+				t.Fatalf("FAILED %s | Expected %s, got %s", tc.test, tc.expectedCheckSum, ck)
 			}
 		})
 	}

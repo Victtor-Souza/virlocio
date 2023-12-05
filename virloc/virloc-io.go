@@ -39,7 +39,7 @@ func NewVirlocReport(ms string) (VirlocReport, error) {
 	case REPORT_RUV03:
 		return newRUV03(message), nil
 	default:
-		return nil, ErrReportNotConfigured(string(rp))
+		return newDefault(message), nil
 	}
 }
 
