@@ -2,6 +2,7 @@ package virloc
 
 import (
 	"fmt"
+	"math/rand"
 	"strings"
 )
 
@@ -18,6 +19,14 @@ func CalculateChecksum(data string) string {
 	}
 	calculatedChecksum = fmt.Sprintf("%X", calc)
 	return calculatedChecksum
+}
+
+func GetMessageNumber() string {
+	min := 32768
+	max := 65535
+	messageNumber := rand.Intn(max-min) + min
+
+	return fmt.Sprintf("%X", messageNumber)
 }
 
 func removeSpecialCharsAndSpaces(message string) string {
