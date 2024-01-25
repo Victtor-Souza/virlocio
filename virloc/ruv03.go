@@ -44,16 +44,23 @@ func (r *RUV03) serialize(msg string) (VirlocReport, error) {
 	msgwr := removeSpecialCharsAndSpaces(msg)
 	arrmsg := strings.Split(msgwr, ",")
 
+	var (
+		date string
+		time string
+	)
+
 	if _, err := fmt.Sscanf(arrmsg[0], "%5s%3s", &r.PackageType, &r.EventIndexDispatch); err != nil {
 		return nil, ErrReadingMessage(err)
 	}
 
 	r.ProtocolIdentifier = arrmsg[1]
 
-	if _, err := fmt.Sscanf(arrmsg[2], "%6s%6s", &r.Date, &r.Time); err != nil {
+	if _, err := fmt.Sscanf(arrmsg[2], "%6s%6s", &date, &time); err != nil {
 		return nil, ErrReadingMessage(err)
 	}
 
+	r.Date = formatDate(date)
+	r.Time = formatTime(time)
 	r.ThrottlePosition = arrmsg[3]
 	r.Hourmeter = arrmsg[4]
 	r.Odometer = arrmsg[5]
@@ -70,10 +77,10 @@ func (r *RUV03) serialize(msg string) (VirlocReport, error) {
 	r.Empty3 = arrmsg[16]
 	r.Empty4 = arrmsg[17]
 	r.Empty5 = arrmsg[18]
-	r.CruiseControlState = arrmsg[19]
-	r.EmploymentState = arrmsg[20]
-	r.ParkingBrakeState = arrmsg[21]
-	r.ServiceBrakeState = removeDeviceData(arrmsg[22])
+	r.CruiseControlState = getonoff(arrmsg[19], "0", "1")
+	r.EmploymentState = getonoff(arrmsg[20], "0", "64")
+	r.ParkingBrakeState = getonoff(arrmsg[21], "0", "4")
+	r.ServiceBrakeState = removeDeviceData(getonoff(arrmsg[22], "0", "8"))
 
 	return r, nil
 }

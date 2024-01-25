@@ -2,6 +2,7 @@ package virloc
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 )
 
@@ -12,13 +13,21 @@ type RUV01 struct {
 	ProtocolIdentifier          string
 	Date                        string
 	Time                        string
-	Latitude                    string
-	Longitude                   string
+	Latitude                    float64
+	Longitude                   float64
 	Speed                       string
 	Direction                   string
 	GpsState                    string
 	SecondsSinceLastPosition    string
 	StateDigitalInputs          string
+	DInput0                     string
+	DInput1                     string
+	DInput2                     string
+	DInput3                     string
+	DInput4                     string
+	DInput5                     string
+	MainSupplyInput             string
+	IgnitionInput               string
 	Empty1                      string
 	HDOPLastPosition            string
 	BackupBatteryVoltage        string
@@ -45,6 +54,10 @@ func (r *RUV01) ToRawMessage() string {
 func (r *RUV01) serialize(msg string) (VirlocReport, error) {
 	message := removeSpecialCharsAndSpaces(msg)
 
+	var (
+		date, time, lat, long, dgtinputs, scdslp string
+	)
+
 	arrmes := strings.Split(message, ",")
 	_, err := fmt.Sscanf(arrmes[0], "%5s%3s", &r.PackageType, &r.EventIndexDispatch)
 
@@ -54,15 +67,15 @@ func (r *RUV01) serialize(msg string) (VirlocReport, error) {
 
 	r.ProtocolIdentifier = arrmes[1]
 
-	_, err = fmt.Sscanf(arrmes[2], "%6s%6s%8s%9s%3s%3s%1s%2s%2s%2s%2s", &r.Date,
-		&r.Time,
-		&r.Latitude,
-		&r.Longitude,
+	_, err = fmt.Sscanf(arrmes[2], "%6s%6s%8s%9s%3s%3s%1s%2s%2s%2s%2s", &date,
+		&time,
+		&lat,
+		&long,
 		&r.Speed,
 		&r.Direction,
 		&r.GpsState,
-		&r.SecondsSinceLastPosition,
-		&r.StateDigitalInputs,
+		&scdslp,
+		&dgtinputs,
 		&r.Empty1,
 		&r.HDOPLastPosition)
 
@@ -76,6 +89,20 @@ func (r *RUV01) serialize(msg string) (VirlocReport, error) {
 		return nil, ErrReadingMessage(err)
 	}
 
+	if err := r.setDigitalInputsState(dgtinputs); err != nil {
+		return nil, ErrReadingMessage(err)
+	}
+
+	sslp, err := strconv.ParseUint(scdslp, 16, 32)
+	if err != nil {
+		return nil, ErrReadingMessage(err)
+	}
+
+	r.Date = formatDate(date)
+	r.Time = formatTime(time)
+	r.Latitude = convertStringToFloat64(lat, 2)
+	r.Longitude = convertStringToFloat64(long, 3)
+	r.SecondsSinceLastPosition = fmt.Sprintf("%v", sslp)
 	r.MaxSpeedOnViolationEvent = arrmes[4]
 	r.MaxRotationOnViolationEvent = arrmes[5]
 	r.Empty2 = arrmes[6]
@@ -91,7 +118,6 @@ func (r *RUV01) serialize(msg string) (VirlocReport, error) {
 	r.DriverId = removeDeviceData(arrmes[16])
 
 	return r, nil
-
 }
 
 func newRUV01(ms message) VirlocReport {
@@ -100,4 +126,25 @@ func newRUV01(ms message) VirlocReport {
 	}
 
 	return r
+}
+
+func (r *RUV01) setDigitalInputsState(dgtinputs string) error {
+	sdi, err := strconv.ParseUint(dgtinputs, 16, 32)
+
+	if err != nil {
+		return ErrReadingMessage(err)
+	}
+	r.StateDigitalInputs = fmt.Sprintf("%8b", sdi)
+
+	states := asBits(sdi)
+	r.IgnitionInput = getonoff(fmt.Sprint(states[0]), "0", "1")
+	r.MainSupplyInput = getonoff(fmt.Sprint(states[1]), "0", "1")
+	r.DInput5 = getonoff(fmt.Sprint(states[2]), "0", "1")
+	r.DInput4 = getonoff(fmt.Sprint(states[3]), "0", "1")
+	r.DInput3 = getonoff(fmt.Sprint(states[4]), "0", "1")
+	r.DInput2 = getonoff(fmt.Sprint(states[5]), "0", "1")
+	r.DInput1 = getonoff(fmt.Sprint(states[6]), "0", "1")
+	r.DInput0 = getonoff(fmt.Sprint(states[7]), "0", "1")
+
+	return nil
 }
