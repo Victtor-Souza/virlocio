@@ -113,9 +113,9 @@ func newRUV03(ms message) VirlocReport {
 func (r *RUV03) setOutputsStates(stateoutputs string) error {
 	sout := strings.Split(stateoutputs, "")
 
-	r.Output0 = sout[0]
-	r.Output1 = sout[1]
-	r.Output2 = sout[2]
+	r.Output0 = getonoff(sout[0], "0", "1")
+	r.Output1 = getonoff(sout[1], "0", "1")
+	r.Output2 = getonoff(sout[2], "0", "1")
 
 	return nil
 }
