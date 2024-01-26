@@ -40,6 +40,9 @@ type RUV03 struct {
 	DInput3            string
 	DInput4            string
 	DInput5            string
+	Output0            string
+	Output1            string
+	Output2            string
 	MainSupplyInput    string
 	IgnitionInput      string
 }
@@ -73,28 +76,30 @@ func (r *RUV03) serialize(msg string) (VirlocReport, error) {
 	r.Date = formatDate(date)
 	r.Time = formatTime(time)
 	dgtsinput = strings.TrimSpace(arrmsg[3])
-	r.ThrottlePosition = arrmsg[4]
-	r.Hourmeter = arrmsg[5]
-	r.Odometer = arrmsg[6]
-	r.EngineRotation = arrmsg[7]
-	r.EngineTemperature = arrmsg[8]
-	r.EnginePressure = arrmsg[9]
-	r.FuelLevel = arrmsg[10]
-	r.FuelConsumption = arrmsg[11]
-	r.Empty1 = arrmsg[12]
-	r.Speed = arrmsg[13]
-	r.EngineTorque = arrmsg[14]
-	r.Empty2 = arrmsg[15]
-	r.EngineBrake = arrmsg[16]
-	r.Empty3 = arrmsg[17]
-	r.Empty4 = arrmsg[18]
-	r.Empty5 = arrmsg[19]
-	r.CruiseControlState = getonoff(arrmsg[20], "0", "1")
-	r.EmploymentState = getonoff(arrmsg[21], "0", "64")
-	r.ParkingBrakeState = getonoff(arrmsg[22], "0", "4")
-	r.ServiceBrakeState = removeDeviceData(getonoff(arrmsg[23], "0", "8"))
+	stsout := arrmsg[4]
+	r.ThrottlePosition = arrmsg[5]
+	r.Hourmeter = arrmsg[6]
+	r.Odometer = arrmsg[7]
+	r.EngineRotation = arrmsg[8]
+	r.EngineTemperature = arrmsg[9]
+	r.EnginePressure = arrmsg[10]
+	r.FuelLevel = arrmsg[11]
+	r.FuelConsumption = arrmsg[12]
+	r.Empty1 = arrmsg[13]
+	r.Speed = arrmsg[14]
+	r.EngineTorque = arrmsg[15]
+	r.Empty2 = arrmsg[16]
+	r.EngineBrake = arrmsg[17]
+	r.Empty3 = arrmsg[18]
+	r.Empty4 = arrmsg[19]
+	r.Empty5 = arrmsg[20]
+	r.CruiseControlState = getonoff(arrmsg[21], "0", "1")
+	r.EmploymentState = getonoff(arrmsg[22], "0", "64")
+	r.ParkingBrakeState = getonoff(arrmsg[23], "0", "4")
+	r.ServiceBrakeState = removeDeviceData(getonoff(arrmsg[24], "0", "8"))
 
 	r.setDigitalInputsState(dgtsinput)
+	r.setOutputsStates(stsout)
 
 	return r, nil
 }
@@ -103,6 +108,16 @@ func newRUV03(ms message) VirlocReport {
 	return &RUV03{
 		message: ms,
 	}
+}
+
+func (r *RUV03) setOutputsStates(stateoutputs string) error {
+	sout := strings.Split(stateoutputs, "")
+
+	r.Output0 = sout[0]
+	r.Output1 = sout[1]
+	r.Output2 = sout[2]
+
+	return nil
 }
 
 func (r *RUV03) setDigitalInputsState(dgtinputs string) error {
