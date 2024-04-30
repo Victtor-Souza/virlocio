@@ -14,13 +14,13 @@ func TestSerialize(t *testing.T) {
 	}
 
 	testCases := []TestCase{
+		{test: "Message RUV01",
+			message:  ">RUV01131,NT003,300424141547-2353018-046569500000027B34E0001,04282463,0,0,0,0,0,0,0,0,0,0,1,4G:1,00000;ID=2364;#16A8;*51<",
+			expected: nil,
+		},
 		{
 			test:     "MESSAGE RUV03",
 			message:  ">RUV03150,NT003,030822184257,5F,000,65,69584,120455002,2312,86,10,29,44895330,0,40,36,0,0,0,0,0,0,0,0,0;ID=0679;#0030;*54<",
-			expected: nil,
-		},
-		{test: "Message RUV01",
-			message:  ">RUV01102,NT003,260124015052+0000000+0000000000000076C5E0000,04011118,0,0,0,0,0,0,0,0,0,0,0,4G:0,00000;ID=0675;#35F5;*2B<",
 			expected: nil,
 		},
 		{test: "Message QTT",

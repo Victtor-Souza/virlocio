@@ -139,12 +139,12 @@ func (r *RUV01) setDigitalInputsState(dgtinputs string) error {
 	states := asBits(sdi)
 	r.IgnitionInput = getonoff(fmt.Sprint(states[0]), "0", "1")
 	r.MainSupplyInput = getonoff(fmt.Sprint(states[1]), "0", "1")
-	r.DInput5 = getonoff(fmt.Sprint(states[2]), "0", "1")
-	r.DInput4 = getonoff(fmt.Sprint(states[3]), "0", "1")
-	r.DInput3 = getonoff(fmt.Sprint(states[4]), "0", "1")
-	r.DInput2 = getonoff(fmt.Sprint(states[5]), "0", "1")
-	r.DInput1 = getonoff(fmt.Sprint(states[6]), "0", "1")
-	r.DInput0 = getonoff(fmt.Sprint(states[7]), "0", "1")
+	r.DInput5 = getonoff(fmt.Sprint(states[2]), "1", "0")
+	r.DInput4 = getonoff(fmt.Sprint(states[3]), "1", "0")
+	r.DInput3 = getonoff(fmt.Sprint(states[4]), "1", "0")
+	r.DInput2 = getonoff(fmt.Sprint(states[5]), "1", "0")
+	r.DInput1 = getonoff(fmt.Sprint(states[6]), "1", "0")
+	r.DInput0 = getonoff(fmt.Sprint(states[7]), "1", "0")
 
 	return nil
 }
