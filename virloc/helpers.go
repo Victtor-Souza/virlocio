@@ -78,7 +78,7 @@ func convertStringToFloat64(value string, decimalPlaces int64) float64 {
 	newstr = append(newstr, arr[:decimalPlaces+1]...)
 
 	newstr = append(newstr, ".")
-	newstr = append(newstr, arr[decimalPlaces:len(arr)-1]...)
+	newstr = append(newstr, arr[decimalPlaces+1:]...)
 
 	result, _ := strconv.ParseFloat(strings.Join(newstr, ""), 64)
 
