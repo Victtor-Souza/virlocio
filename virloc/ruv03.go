@@ -15,14 +15,14 @@ type RUV03 struct {
 	Time               string
 	ThrottlePosition   string
 	Hourmeter          string
-	Odometer           string
-	EngineRotation     string
+	Odometer           int64
+	EngineRotation     int64
 	EngineTemperature  string
 	EnginePressure     string
-	FuelLevel          string
+	FuelLevel          int64
 	FuelConsumption    string
 	Empty1             string
-	Speed              string
+	Speed              int64
 	EngineTorque       string
 	Empty2             string
 	EngineBrake        string
@@ -79,14 +79,14 @@ func (r *RUV03) serialize(msg string) (VirlocReport, error) {
 	stsout := arrmsg[4]
 	r.ThrottlePosition = arrmsg[5]
 	r.Hourmeter = arrmsg[6]
-	r.Odometer = arrmsg[7]
-	r.EngineRotation = arrmsg[8]
+	r.Odometer = convertStringToInt64(arrmsg[7])
+	r.EngineRotation = convertStringToInt64(arrmsg[8])
 	r.EngineTemperature = arrmsg[9]
 	r.EnginePressure = arrmsg[10]
-	r.FuelLevel = arrmsg[11]
+	r.FuelLevel = convertStringToInt64(arrmsg[11])
 	r.FuelConsumption = arrmsg[12]
 	r.Empty1 = arrmsg[13]
-	r.Speed = arrmsg[14]
+	r.Speed = convertStringToInt64(arrmsg[14])
 	r.EngineTorque = arrmsg[15]
 	r.Empty2 = arrmsg[16]
 	r.EngineBrake = arrmsg[17]

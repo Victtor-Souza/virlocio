@@ -9,8 +9,8 @@ type QTT struct {
 	PackageType                        string
 	Date                               string
 	Time                               string
-	Latitude                           string
-	Longitude                          string
+	Latitude                           float64
+	Longitude                          float64
 	Speed                              string
 	DirectionLastPosition              string
 	LastPositionState                  string
@@ -45,12 +45,17 @@ func (qtt *QTT) ToRawMessage() string {
 
 func (qtt *QTT) serialize(msg string) (VirlocReport, error) {
 	messagewspace := removeSpecialCharsAndSpaces(msg)
+	var (
+		latitude  string
+		longitude string
+	)
+
 	if _, err := fmt.Sscanf(messagewspace, "%3s%6s%6s%8s%9s%3s%3s%1s%2s%2s%2s%2s%1s%1s%2s%2s%2s%1s%1s%1s%4s%4s%4s%4s%4s",
 		&qtt.PackageType,
 		&qtt.Date,
 		&qtt.Time,
-		&qtt.Latitude,
-		&qtt.Longitude,
+		&latitude,
+		&longitude,
 		&qtt.Speed,
 		&qtt.DirectionLastPosition,
 		&qtt.LastPositionState,
@@ -74,6 +79,9 @@ func (qtt *QTT) serialize(msg string) (VirlocReport, error) {
 	); err != nil {
 		return nil, ErrReadingMessage(err)
 	}
+
+	qtt.Longitude = convertStringToFloat64(longitude, 3)
+	qtt.Latitude = convertStringToFloat64(latitude, 2)
 
 	return qtt, nil
 }

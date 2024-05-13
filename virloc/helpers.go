@@ -85,6 +85,17 @@ func convertStringToFloat64(value string, decimalPlaces int64) float64 {
 	return result
 }
 
+func convertStringToInt64(value string) int64 {
+	v, err := strconv.ParseInt(value, 10, 64)
+
+	if err != nil {
+		fmt.Printf("PARSE ERROR - %s\n", err.Error())
+		return 0
+	}
+
+	return v
+}
+
 func asBits(val uint64) []uint64 {
 	bits := []uint64{}
 	for i := 0; i < 8; i++ {
